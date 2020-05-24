@@ -211,7 +211,13 @@
        (async-shell-command (format "javac %s && java %s && rm *.class"	$myfilename
                                     (file-name-sans-extension
                                      (file-name-nondirectory $myfilename)))))))
+(defun run-pyscript-trade ()
+  "Show the Quant Strategy Order Status"
+  (interactive)
+  (async-shell-command "python ~/Devcode/PyScript/myOrders.py")
+  (other-window 1))
 
 (global-set-key (kbd "C-x x") 'run-current-file)
 (global-set-key (kbd "C-x C-x") 'run-current-file)
 
+(global-set-key (kbd "C-x C-o") 'run-pyscript-trade)
