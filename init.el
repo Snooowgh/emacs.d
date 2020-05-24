@@ -2,6 +2,11 @@
 
 ;; Without this comment emacs25 adds (package-initialize) here
 ;; (package-initialize)
+(autoload 'pymacs-apply "pymacs")
+(autoload 'pymacs-call "pymacs")
+(autoload 'pymacs-eval "pymacs" nil t)
+(autoload 'pymacs-exec "pymacs" nil t)
+(autoload 'pymacs-load "pymacs" nil t)
 
 (let* ((minver "25.1"))
   (when (version< emacs-version minver)
@@ -187,3 +192,26 @@
 ;;; no-byte-compile: t
 ;;; End:
 (put 'erase-buffer 'disabled nil)
+
+
+(defun run-current-file()
+  " Execute the current file: support C++, Java, Python"
+  (interactive)
+  (when (not (buffer-file-name)) (save-buffer))
+  (when (buffer-modified-p) (save-buffer))
+  (setq $myfilename buffer-file-name)
+  (setq $myfileextension (file-name-extension $myfilename))
+  (cond
+   ((string-equal $myfileextension "py")
+         (async-shell-command (format "python %s" $myfilename)))
+    ((string-equal $myfileextension "cpp")
+      (async-shell-command (format "g++ %s -o test && ./test" $myfilename))
+    (switch-to-buffer-other-window "*Async Shell Command*"))
+    ((string-equal $myfileextension "java")
+       (async-shell-command (format "javac %s && java %s && rm *.class"	$myfilename
+                                    (file-name-sans-extension
+                                     (file-name-nondirectory $myfilename)))))))
+
+(global-set-key (kbd "C-x x") 'run-current-file)
+(global-set-key (kbd "C-x C-x") 'run-current-file)
+
